@@ -15,9 +15,9 @@ export const AppRouter = () => {
       </PublicRoutes>
       }/>
       <Route path="/dashboard/*" element={
-      <PrivateRoutes>
+      //<PrivateRoutes>
         <AppRoutes/>
-      </PrivateRoutes>
+      //</PrivateRoutes>
       }/>
     </Routes>
 

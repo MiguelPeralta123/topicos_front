@@ -5,6 +5,7 @@ export const modalStyle = {
     transform: 'translate(-50%, -50%)',
     width: 600,
     height: 500,
+    'border-radius': '1rem',
     bgcolor: 'background.paper',
     boxShadow: 24,
     p: 4,

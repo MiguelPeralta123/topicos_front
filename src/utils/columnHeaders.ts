@@ -3,18 +3,17 @@ export const columns: GridColDef[] = [
     {
       field: 'nombre',
       headerName: 'Nombre',
-      width: 150,
+      width: 250,
     },
     {
       field: 'last_maintenance',
       headerName: 'Último mantenimiento',
-      width: 150,
+      width: 350,
     },
     {
       field: 'type',
-      headerName: 'status',
-      type: 'date',
-      width: 150,
+      headerName: 'Estatus',
+      width: 250,
     },
   ];
   

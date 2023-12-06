@@ -3,7 +3,7 @@ import axios from "axios"
 
 export const deleteAreas = async (ids: GridRowSelectionModel) =>{
     const token = localStorage.getItem( 'jwt_bride')
-    const data = await axios.delete('http://localhost:3001/area', {
+    const data = await axios.delete('https://web-production-20aed.up.railway.app/area', {
         data: ids, 
         headers: {'Authorization': `Bearer ${token}`}} )
     return data.data
