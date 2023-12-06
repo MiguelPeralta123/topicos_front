@@ -3,11 +3,11 @@ export interface IArea {
   nombre: string
   last_maintenance: Date
   type: Status
-  }
+}
   
   
 export enum Status{
-  available = 'AVAILABLE',
-  unavailable = 'UNAVAILABLE',
-  maintenance = 'MAINTENANCE'
+  available = 'Disponible',
+  unavailable = 'No disponible',
+  maintenance = 'En mantenimiento'
 }

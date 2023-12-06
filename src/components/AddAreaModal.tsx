@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, FormControl, Grid, InputLabel, MenuItem, Modal, Select, Snackbar, TextField, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Grid, MenuItem, Modal, Select, Snackbar, TextField, Typography } from '@mui/material';
 import { modalStyle } from '../styles/modalStyle';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -13,10 +13,11 @@ import CloseIcon from '@mui/icons-material/Close';
   interface AddGuestModalProps{
     modalState: boolean
     handleModal: () => void
+    toggleDrawer: () => void
     area?: IArea
     title?: string
   }
-export const AddAreaModal = ({ modalState, handleModal, area, title }: AddGuestModalProps) => {
+export const AddAreaModal = ({ modalState, handleModal, toggleDrawer, area, title }: AddGuestModalProps) => {
   const { setNewAddedArea, areas, setNewAreas } = useContext(AppContext)
     const [ loading, setLoading ] = useState<boolean>(false)
     const [ successAdd, setSuccessAdd ] = useState<boolean>(false)
@@ -34,11 +35,13 @@ export const AddAreaModal = ({ modalState, handleModal, area, title }: AddGuestM
               const { type, ...rest } = values
                 setLoading(true)
                 if(!area){
-                  const newArea = {id: uuidv4(), type: Status.available, ...rest} as IArea
+                  const newArea = {id: uuidv4(), type: type, ...rest} as IArea
                     await addArea(newArea)
                     setNewAddedArea(newArea)
                     setSuccessAdd(true)
                     resetForm()
+                    handleModal()
+                    toggleDrawer()
                 }else{
                     await updataArea({id: area.id, ...values} as IArea)
                     const newArray = areas.map(areaMap => areaMap.id === area.id ? 
@@ -48,30 +51,24 @@ export const AddAreaModal = ({ modalState, handleModal, area, title }: AddGuestM
                         last_maintenance: values.last_maintenance,
                         type: values.type,
                       } as IArea : areaMap);
-
-                      setNewAreas(newArray)
+                    
+                    setNewAreas(newArray)
                     setSuccessEdit(true)
-                
+                    handleModal()
                 }
             }catch(e){
                 setError(true)
             }finally{
-
                 setLoading(false)
                 setTimeout(()=> setError(false), 3000)
                 setTimeout(()=> setSuccessAdd(false), 3000)
                 setTimeout(()=> setSuccessEdit(false), 3000)
-
             }
         },
         validationSchema: Yup.object({
-            
-            nombre: Yup.string().matches(/^[a-zA-Z]+$/, 'Nombre debe contener solo letras').required('Campo requerido'),
-            num_invitados: Yup.number().required('Campo requerido'),
-            email: Yup.string()
-            .email('El correo no tiene un formato válido')
-            .required('Campo requerido'),
-            phone_number: Yup.string().matches(/^\+?[1-9]\d{1,14}$/, 'Número de telefono invalido').required('Campo requerido').min(10, 'El número de télefono deben ser de 10 números').max(10, 'El número de télefono deben ser de 10 números'),
+            nombre: Yup.string().matches(/^[a-zA-ZñÑ ]+$/, 'El nombre debe contener solo letras').required('Campo requerido'),
+            last_maintenance: Yup.date().required('Campo requerido'),
+            type: Yup.string().required('Campo requerido'),
         })
     });
   return (
@@ -97,10 +94,10 @@ export const AddAreaModal = ({ modalState, handleModal, area, title }: AddGuestM
                             autoHideDuration={3000}
                             message="Editado con exito"
             /> :  null}
-            <Box sx={{display: 'flex', justifyContent:'flex-end'}}>
+            <Box sx={{display: 'flex', justifyContent:'space-between', marginBottom: 3}}>
+              <Typography variant='h5' sx={{fontWeight: 'bold'}}>{title}</Typography>
               <Button color='error' onClick={handleModal}><CloseIcon/></Button>
             </Box>
-            <Typography variant='h5' sx={{marginBottom: 3}}>{title}</Typography>
             <form onSubmit={formik.handleSubmit}>
             <Grid container spacing={2}>
 
@@ -120,9 +117,8 @@ export const AddAreaModal = ({ modalState, handleModal, area, title }: AddGuestM
                 <TextField
                 sx={{marginBottom: 3}}
                   id="last_maintenance"
-                  name="num_invitados"
-                  label="Último mantenimiento"
-                  type='date'              
+                  name="last_maintenance"
+                  type='date'
                   value={formik.values.last_maintenance}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -135,23 +131,41 @@ export const AddAreaModal = ({ modalState, handleModal, area, title }: AddGuestM
                 <Grid item xs={6}>
 
             
-                <TextField
+                {/*<TextField
                 sx={{marginBottom: 3}}
                   id="type"
                   name="type"
-                  label="Status"
+                  label="Estatus"
                   type="text"
                   value={formik.values.type}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   error={formik.touched.type && Boolean(formik.errors.type)}
                   helperText={formik.touched.type && formik.errors.type}
-                />
+                />*/}
+
+                <Select
+                  sx={{ marginBottom: 3 }}
+                  id="type"
+                  name="type"
+                  value={formik.values.type}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.type && Boolean(formik.errors.type)}
+                  displayEmpty
+                  renderValue={(selected) => (selected ? selected : 'Selecciona un estatus')}
+                >
+                  {Object.values(Status).map((status) => (
+                    <MenuItem key={status} value={status}>
+                      {status}
+                    </MenuItem>
+                  ))}
+                </Select>
               
                  </Grid>
              </Grid>
                 <Button disabled={ loading } sx={{marginBottom: 3, alignSelf: 'flex-end', width: 150, height: 40, marginTop: 3}} type="submit" variant="outlined" color="primary">
-                  {loading ? <CircularProgress size={20}/> : title === 'Editar' ? 'Editar' : 'Agregar'}
+                  {loading ? <CircularProgress size={20}/> : title === 'Editar' ? 'Guardar' : 'Agregar'}
                 </Button>
              </form>
         </Box>
